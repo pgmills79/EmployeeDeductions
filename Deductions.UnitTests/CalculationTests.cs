@@ -21,10 +21,27 @@ namespace Deductions.UnitTests
             //arrange
 
             //action
-            var nameStartsWithInputLetter = CommonMethods.DoesNameStartWithLetter(nameInput, letterToCheck);
+            var nameStartsWithInputLetter = Utility.DoesNameStartWithLetter(nameInput, letterToCheck);
 
             //assert
-           Assert.True(nameStartsWithInputLetter == expectedResult);
+           Assert.True(nameStartsWithInputLetter.Equals(expectedResult));
+        }
+        
+        [Theory]
+        [InlineData(3, 1500.00)]
+        [InlineData(2, 1000)]
+        [InlineData(50, 25000)]
+        [InlineData(0, 0)]
+        [InlineData(-10, 0)]
+        public void Get_Total_Cost_Dependents_Should_Return_Correct_Amount(int numberDependents, decimal  expectedAmount)
+        {
+            //arrange
+
+            //action
+            var totalCost = Utility.GetTotalCostDependents(numberDependents);
+
+            //assert
+            Assert.True(totalCost.Equals(expectedAmount));
         }
     }
 }

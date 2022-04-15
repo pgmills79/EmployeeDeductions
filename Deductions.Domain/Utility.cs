@@ -2,7 +2,7 @@
 
 namespace Deductions.Domain
 {
-    public static class CommonMethods
+    public static class Utility
     {
         public static bool DoesNameStartWithLetter(string nameInput, char letterToCheck)
         {
@@ -10,6 +10,13 @@ namespace Deductions.Domain
             
             return !string.IsNullOrEmpty(letterToCheck.ToString()) 
                    && nameInput.TrimStart().StartsWith(letterToCheck.ToString(), StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public static decimal GetTotalCostDependents(int numberOfDependents = 0)
+        {
+            if (numberOfDependents <= 0) return 0;
+
+            return numberOfDependents * 500;
         }
     }
 }
