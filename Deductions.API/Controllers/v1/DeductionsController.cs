@@ -5,7 +5,6 @@ using Deductions.Domain.Models;
 using Deductions.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Deductions.API.Controllers.v1
 {

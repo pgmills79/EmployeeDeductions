@@ -1,5 +1,4 @@
 ﻿using System;
-using Deductions.Domain.Models;
 
 namespace Deductions.Domain
 {

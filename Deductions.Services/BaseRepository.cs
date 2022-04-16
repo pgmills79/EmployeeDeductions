@@ -1,5 +1,4 @@
-﻿using System;
-using Deductions.Domain;
+﻿using Deductions.Domain;
 
 namespace Deductions.Services
 {
