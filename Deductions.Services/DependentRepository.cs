@@ -14,9 +14,10 @@ namespace Deductions.Services
     
     public class DependentRepository : BaseRepository, IDependentRepository
     {
-
+        private readonly IUtility _utilityService;
         public DependentRepository(IUtility utilityService) : base(utilityService)
         {
+            _utilityService = utilityService;
         }
 
         public decimal GetDependentDeductionAmount(List<Dependent> dependents)
@@ -27,8 +28,9 @@ namespace Deductions.Services
 
         public decimal GetTotalDependentDiscountAmount(List<Dependent> dependents)
         {
-            return dependents?.Any() != true ? 0 
-                : dependents.Sum(dependent => GetDeductionAmount(dependent.Name, GetDependentDiscountAmount(), GetDeductionAmount()));
+            if (dependents?.Any() != true) return 0;
+            return dependents.Sum(dependent => _utilityService.DoesNameStartWithLetter(dependent.Name, Constants.ApplyDiscountLetter) 
+                ? GetDependentDiscountAmount() : 0);
         }
         
         private static decimal GetDeductionAmount()

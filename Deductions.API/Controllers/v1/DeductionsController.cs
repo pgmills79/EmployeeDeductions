@@ -51,7 +51,9 @@ namespace Deductions.API.Controllers.v1
             //Grab discount information for information purposes
             var employeeTotalDiscountAmount = 0.00m;
             
-            employeeTotalDiscountAmount += _employeeService.GetEmployeeDiscountAmount();
+            employeeTotalDiscountAmount += _utilityService.DoesNameStartWithLetter(employeeEntity.Name, Constants.ApplyDiscountLetter) 
+                ? _employeeService.GetEmployeeDiscountAmount() : 0;
+            
             employeeTotalDiscountAmount += _dependentService.GetTotalDependentDiscountAmount(employeeEntity.Dependents);
 
             return new JsonResult(new DeductionResult
