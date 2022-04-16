@@ -1,16 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Deductions.Domain.Models
 {
-    public interface IEmployee
-    {
-       // List<IPerson> Dependents { get; set; }
-    }
 
-    public class Employee : IPerson, IEmployee
+    public class Employee : IPerson
     {
+        [JsonPropertyName("Employee Name")]
         public string Name { get; set; }
 
-        public List<IPerson> Dependents { get; set; }
+        public List<Dependent> Dependents { get; set; }
     }
 }

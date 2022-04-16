@@ -1,5 +1,6 @@
 ﻿using System;
 using Deductions.Domain;
+using Deductions.Domain.Models;
 
 namespace Deductions.Services
 {
@@ -8,7 +9,7 @@ namespace Deductions.Services
         decimal GetEmployeeDeductionAmount(string name);
 
         decimal GetEmployeeDiscountAmount();
-        decimal GetEmployeeTotalCostPerPaycheck();
+        decimal GetEmployeeTotalCostPerPaycheck(Employee employeeEntity);
     }
     
     
@@ -49,8 +50,9 @@ namespace Deductions.Services
                                      IBaseRepository.NumberOfPaychecks);
         }
 
-        public decimal GetEmployeeTotalCostPerPaycheck()
+        public decimal GetEmployeeTotalCostPerPaycheck(Employee employeeEntity)
         {
+            
             throw new NotImplementedException();
         }
 
