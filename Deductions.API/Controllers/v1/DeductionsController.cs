@@ -16,25 +16,38 @@ namespace Deductions.API.Controllers.v1
 
         private readonly ILogger<DeductionsController> _logger;
         private readonly IEmployeeRepository _employeeService;
+        private readonly IDependentRepository _dependentService;
 
-        public DeductionsController(ILogger<DeductionsController> logger, IEmployeeRepository employeeService)
+
+        public DeductionsController(ILogger<DeductionsController> logger, IEmployeeRepository employeeService, IDependentRepository dependentService)
         {
             _logger = logger;
             _employeeService = employeeService;
+            _dependentService = dependentService;
         }
 
         /// <summary>
-        /// Get the employee's total paycheck deduction amount with dependennts
+        /// Get the employee's total paycheck deduction amount with dependents
         /// </summary>
-        /// <param name="getEmployeeDeduction"></param>
+        /// <param name="employeeEntity"></param>
         /// <returns></returns>
         [HttpGet]
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public decimal GetEmployeePaycheckDeduction([FromBody] Employee getEmployeeDeduction)
+        public decimal GetEmployeePaycheckDeduction([FromBody] Employee employeeEntity)
         {
-            var result = _employeeService.GetEmployeeTotalCostPerPaycheck(getEmployeeDeduction);
+            
+            //get employee deduction amount
+            var employeeDeductionAmount = _employeeService.GetEmployeeDeductionAmount(employeeEntity.Name);
+            
+            //get dependents deduction amount
+            var dependentDeductionAmount =
+                _dependentService.GetDependentsPaycheckDeductionAmount(employeeEntity.Dependents);
+
+            var totalDeductionAmount = dependentDeductionAmount + employeeDeductionAmount;
+            
+            var result = _employeeService.GetEmployeeTotalCostPerPaycheck(employeeDeductionAmount, dependentDeductionAmount);
 
             return 0.00m;
         }

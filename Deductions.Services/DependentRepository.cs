@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Deductions.Domain;
+using Deductions.Domain.Models;
 
 namespace Deductions.Services
 {
@@ -9,7 +10,7 @@ namespace Deductions.Services
     {
         decimal GetDependentDeductionAmount();
         decimal GetDependentDiscountAmount();
-        decimal GetDependentsPaycheckDeductionAmount(List<string> dependents);
+        decimal GetDependentsPaycheckDeductionAmount(List<Dependent> dependents);
     }
     
     public class DependentRepository : IDependentRepository
@@ -22,7 +23,7 @@ namespace Deductions.Services
             _utilityService = utilityService;
         }
 
-        public decimal GetDependentsPaycheckDeductionAmount(List<string> dependents)
+        public decimal GetDependentsPaycheckDeductionAmount(List<Dependent> dependents)
         {
             var deductionAmount = 0.00m;
 
@@ -32,7 +33,7 @@ namespace Deductions.Services
             //add up the dependents amounts
             foreach (var dependent in dependents)
             {
-                if (_utilityService.DoesNameStartWithLetter(dependent, IBaseRepository.ApplyDiscountLetter))
+                if (_utilityService.DoesNameStartWithLetter(dependent.Name, BaseRepository.ApplyDiscountLetter))
                 {
                     deductionAmount += GetDependentDiscountAmount();
                 }
@@ -48,12 +49,12 @@ namespace Deductions.Services
         
         public decimal GetDependentDeductionAmount()
         {
-            return Convert.ToDecimal(DependentAnnualCost / IBaseRepository.NumberOfPaychecks);
+            return Convert.ToDecimal(DependentAnnualCost / BaseRepository.NumberOfPaychecks);
         }
 
         public decimal GetDependentDiscountAmount()
         {
-            return Convert.ToDecimal( (DependentAnnualCost - IBaseRepository.DiscountPercent * DependentAnnualCost) / IBaseRepository.NumberOfPaychecks);
+            return Convert.ToDecimal( (DependentAnnualCost - BaseRepository.DiscountPercent * DependentAnnualCost) / BaseRepository.NumberOfPaychecks);
         }
         
     }

@@ -43,6 +43,7 @@ namespace Deductoins.API
             //DI service hookup
             services.AddScoped<IUtility, Utility>();
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<IDependentRepository, DependentRepository>();
             
             services.AddMvcCore().SetCompatibilityVersion(CompatibilityVersion.Latest);
             

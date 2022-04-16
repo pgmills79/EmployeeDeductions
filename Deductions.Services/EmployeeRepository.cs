@@ -7,9 +7,8 @@ namespace Deductions.Services
     public interface IEmployeeRepository
     {
         decimal GetEmployeeDeductionAmount(string name);
-
         decimal GetEmployeeDiscountAmount();
-        decimal GetEmployeeTotalCostPerPaycheck(Employee employeeEntity);
+        decimal GetEmployeeTotalCostPerPaycheck(decimal employeeDeductionAmount, decimal dependentDeductionAmount);
     }
     
     
@@ -31,7 +30,7 @@ namespace Deductions.Services
             if (string.IsNullOrEmpty(name)) return 0;
 
             //add up the dependents amounts
-            if (_utilityService.DoesNameStartWithLetter(name, IBaseRepository.ApplyDiscountLetter))
+            if (_utilityService.DoesNameStartWithLetter(name, BaseRepository.ApplyDiscountLetter))
             {
                 deductionAmount += GetEmployeeDiscountAmount();
             }
@@ -46,19 +45,24 @@ namespace Deductions.Services
 
         public decimal GetEmployeeDiscountAmount()
         {
-            return Convert.ToDecimal((EmployeeAnnualCost - IBaseRepository.DiscountPercent * EmployeeAnnualCost) /
-                                     IBaseRepository.NumberOfPaychecks);
+            return Convert.ToDecimal((EmployeeAnnualCost - BaseRepository.DiscountPercent * EmployeeAnnualCost) /
+                                     BaseRepository.NumberOfPaychecks);
         }
 
-        public decimal GetEmployeeTotalCostPerPaycheck(Employee employeeEntity)
+        public decimal GetEmployeeTotalCostPerPaycheck(decimal employeeDeductionAmount, decimal dependentDeductionAmount)
         {
+
+            var totalDeductionAmount = employeeDeductionAmount + dependentDeductionAmount;
             
+            //if the amount is higher than the maximum cost for employee benefits, set it to the maximum amount
+            //if (totalDeductionAmount > _utilityService)
+
             throw new NotImplementedException();
         }
 
         private static decimal GetEmployeeDeductionAmount()
         {
-            return Convert.ToDecimal(EmployeeAnnualCost / IBaseRepository.NumberOfPaychecks);
+            return Convert.ToDecimal(EmployeeAnnualCost / BaseRepository.NumberOfPaychecks);
         }
     }
 }

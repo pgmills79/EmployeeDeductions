@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Deductions.Domain;
+using Deductions.Domain.Models;
 using Deductions.Services;
 using Xunit;
 
@@ -67,7 +68,7 @@ namespace Deductions.UnitTests
         public void GetDependentDiscountAmount_Should_Return_Correct_Amount()
         {
             //arrange
-            var expectedResult = Convert.ToDecimal( (DependentAnnualCost - IBaseRepository.DiscountPercent * DependentAnnualCost) / IBaseRepository.NumberOfPaychecks);
+            var expectedResult = Convert.ToDecimal( (DependentAnnualCost - BaseRepository.DiscountPercent * DependentAnnualCost) / BaseRepository.NumberOfPaychecks);
             
             //action
             var actualResult = _dependentRepository.GetDependentDiscountAmount();
@@ -78,7 +79,7 @@ namespace Deductions.UnitTests
         
         [Theory]
         [MemberData(nameof(TestGetDependentsTestData))]
-        public void Get_Dependents_Paycheck_Deduction_Amount(List<string> dependents, decimal expectedAmount)
+        public void Get_Dependents_Paycheck_Deduction_Amount(List<Dependent> dependents, decimal expectedAmount)
         {
             //arrange
 
@@ -93,14 +94,14 @@ namespace Deductions.UnitTests
             new List<object[]>
             {
                 //No Discounts for these dependents
-                new object[] { new List<string> { "John Doe", "Paul M", "Tom Jerry" }, Convert.ToDecimal(DependentAnnualCost / NumberOfPaychecks) * 3 },
-                new object[] { new List<string> { "John Doe", "Paul M" }, Convert.ToDecimal(500 / 26) * 2 },
+                new object[] { new List<Dependent> { new("John Doe"), new ("Paul M"), new ("Tom Jerry")}, Convert.ToDecimal(DependentAnnualCost / NumberOfPaychecks) * 3 },
+                new object[] { new List<Dependent> { new("John Doe"), new ("Paul M")}, Convert.ToDecimal(500 / 26) * 2 },
                 //10% discount on 1 dependent
-                new object[] { new List<string> { "Adam Bob" }, Convert.ToDecimal( (DependentAnnualCost - DiscountPercent * DependentAnnualCost) / NumberOfPaychecks) * 1 },
+                new object[] { new List<Dependent> { new("Adam Bob")}, Convert.ToDecimal( (DependentAnnualCost - DiscountPercent * DependentAnnualCost) / NumberOfPaychecks) * 1 },
                 //10% discount on 1 dependent
-                new object[] { new List<string> { "Adam Bob", "John Doe" }, Convert.ToDecimal(DependentAnnualCost / NumberOfPaychecks) * 1 + Convert.ToDecimal( (DependentAnnualCost - DiscountPercent * DependentAnnualCost) / NumberOfPaychecks) },
+                new object[] { new List<Dependent> { new("Adam Bob"), new ("John Doe")}, Convert.ToDecimal(DependentAnnualCost / NumberOfPaychecks) * 1 + Convert.ToDecimal( (DependentAnnualCost - DiscountPercent * DependentAnnualCost) / NumberOfPaychecks) },
                 //10% discount on 2 dependents
-                new object[] { new List<string> { "Adam Bob", "Aaron Willis" }, Convert.ToDecimal( (DependentAnnualCost - DiscountPercent * DependentAnnualCost) / NumberOfPaychecks) * 2 },
+                new object[] { new List<Dependent> { new("Adam Bob"), new ("Aaron Willis")}, Convert.ToDecimal( (DependentAnnualCost - DiscountPercent * DependentAnnualCost) / NumberOfPaychecks) * 2 },
                 
             };
         
@@ -128,8 +129,8 @@ namespace Deductions.UnitTests
         public void GetEmployeeDiscountAmount_Should_Return_Correct_Amount()
         {
             //arrange
-            var expectedResult = Convert.ToDecimal((EmployeeAnnualCost - IBaseRepository.DiscountPercent * EmployeeAnnualCost) /
-                                                   IBaseRepository.NumberOfPaychecks).ToString("#.##");
+            var expectedResult = Convert.ToDecimal((EmployeeAnnualCost - BaseRepository.DiscountPercent * EmployeeAnnualCost) /
+                                                   BaseRepository.NumberOfPaychecks).ToString("#.##");
             
             //action
             var actualResult = _employeeRepository.GetEmployeeDiscountAmount();
