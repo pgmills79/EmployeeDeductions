@@ -4,7 +4,12 @@ using System.Linq;
 
 namespace Deductions.Domain
 {
-    public static class Utility
+
+    public interface IUtility
+    {
+        bool DoesNameStartWithLetter(string nameInput, char letterToCheck);
+    }
+    public class Utility : IUtility
     {
         public const int NumberOfPaychecks = 26;
         public const int DependentAnnualCost = 500;
@@ -12,7 +17,7 @@ namespace Deductions.Domain
         private const decimal DiscountPercent = 0.10m;
         private const char ApplyDiscountLetter = 'A';
         
-        public static bool DoesNameStartWithLetter(string nameInput, char letterToCheck)
+        public bool DoesNameStartWithLetter(string nameInput, char letterToCheck)
         {
             if (string.IsNullOrEmpty(nameInput)) return false;
             
@@ -20,7 +25,7 @@ namespace Deductions.Domain
                    && nameInput.TrimStart().StartsWith(letterToCheck.ToString(), StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public static decimal GetDependentsPaycheckDeductionAmount(List<string> dependents)
+        /*public static decimal GetDependentsPaycheckDeductionAmount(List<string> dependents)
         {
             var deductionAmount = 0.00m;
 
@@ -42,17 +47,17 @@ namespace Deductions.Domain
             
             //does name get
             return deductionAmount;
-        }
+        }*/
 
-        public static decimal GetDependentDeductionAmount()
+        /*public static decimal GetDependentDeductionAmount()
         {
             return Convert.ToDecimal(DependentAnnualCost / NumberOfPaychecks);
-        }
+        }*/
 
-        public static decimal GetDependentDiscountAmount()
+        /*public static decimal GetDependentDiscountAmount()
         {
             return Convert.ToDecimal( (DependentAnnualCost - DiscountPercent * DependentAnnualCost) / NumberOfPaychecks);
-        }
+        }*/
         
         public static decimal GetEmployeeDeductionAmount()
         {
