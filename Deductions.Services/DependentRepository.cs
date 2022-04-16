@@ -8,6 +8,7 @@ namespace Deductions.Services
     public interface IDependentRepository
     {
         decimal GetDependentDeductionAmount();
+        decimal GetDependentDiscountAmount();
         decimal GetDependentsPaycheckDeductionAmount(List<string> dependents);
     }
     
@@ -50,7 +51,7 @@ namespace Deductions.Services
             return Convert.ToDecimal(DependentAnnualCost / IBaseRepository.NumberOfPaychecks);
         }
 
-        private static decimal GetDependentDiscountAmount()
+        public decimal GetDependentDiscountAmount()
         {
             return Convert.ToDecimal( (DependentAnnualCost - IBaseRepository.DiscountPercent * DependentAnnualCost) / IBaseRepository.NumberOfPaychecks);
         }

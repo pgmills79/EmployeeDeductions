@@ -23,22 +23,10 @@ namespace Deductions.UnitTests
 
         private const int NumberOfPaychecks = 26;
         private const int DependentAnnualCost = 500;
+        private const int EmployeeAnnualCost = 1000;
         private const  decimal DiscountPercent = 0.10m;
-        
-        [Fact]
-        public void GetDependentDeductionAmount_Should_Return_Correct_Amount()
-        {
-            //arrange
-            var expectedResult = Convert.ToDecimal(Utility.DependentAnnualCost / Utility.NumberOfPaychecks);
-            
-            //action
-            var actualResult = _dependentRepository.GetDependentDeductionAmount();
 
-            //assert
-            Assert.True(expectedResult.Equals(actualResult));
-        }
-        
-        
+
         [Theory]
         [InlineData("John Doe", 'A', false)]
         [InlineData("Aaron Mills", 'A', true)]
@@ -61,6 +49,33 @@ namespace Deductions.UnitTests
         }
 
         #region Dependent Calculations
+        
+        [Fact]
+        public void GetDependentDeductionAmount_Should_Return_Correct_Amount()
+        {
+            //arrange
+            var expectedResult = Convert.ToDecimal(DependentAnnualCost / NumberOfPaychecks).ToString("#.##");
+            
+            //action
+            var actualResult = _dependentRepository.GetDependentDeductionAmount();
+
+            //assert
+            Assert.True(expectedResult.Equals(actualResult.ToString("#.##")));
+        }
+        
+        [Fact]
+        public void GetDependentDiscountAmount_Should_Return_Correct_Amount()
+        {
+            //arrange
+            var expectedResult = Convert.ToDecimal( (DependentAnnualCost - IBaseRepository.DiscountPercent * DependentAnnualCost) / IBaseRepository.NumberOfPaychecks);
+            
+            //action
+            var actualResult = _dependentRepository.GetDependentDiscountAmount();
+
+            //assert
+            Assert.True(expectedResult.Equals(actualResult));
+        }
+        
         [Theory]
         [MemberData(nameof(TestGetDependentsTestData))]
         public void Get_Dependents_Paycheck_Deduction_Amount(List<string> dependents, decimal expectedAmount)
@@ -109,12 +124,24 @@ namespace Deductions.UnitTests
             Assert.True(paycheckDeductionAmount.Equals(expectedAmount.ToString("#.##")));
         }
         
-    
-        
+        [Fact]
+        public void GetEmployeeDiscountAmount_Should_Return_Correct_Amount()
+        {
+            //arrange
+            var expectedResult = Convert.ToDecimal((EmployeeAnnualCost - IBaseRepository.DiscountPercent * EmployeeAnnualCost) /
+                                                   IBaseRepository.NumberOfPaychecks).ToString("#.##");
+            
+            //action
+            var actualResult = _employeeRepository.GetEmployeeDiscountAmount();
+
+            //assert
+            Assert.True(expectedResult.Equals(actualResult.ToString("#.##")));
+        }
+
+       
 
         #endregion
 
-       
     }
     
    

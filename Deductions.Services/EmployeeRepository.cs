@@ -7,6 +7,7 @@ namespace Deductions.Services
     {
         decimal GetEmployeeDeductionAmount(string name);
 
+        decimal GetEmployeeDiscountAmount();
         decimal GetEmployeeTotalCostPerPaycheck();
     }
     
@@ -37,13 +38,12 @@ namespace Deductions.Services
             {
                 deductionAmount += GetEmployeeDeductionAmount();
             }
-          
-            
+
             //does name get
             return deductionAmount;
         }
 
-        private static decimal GetEmployeeDiscountAmount()
+        public decimal GetEmployeeDiscountAmount()
         {
             return Convert.ToDecimal((EmployeeAnnualCost - IBaseRepository.DiscountPercent * EmployeeAnnualCost) /
                                      IBaseRepository.NumberOfPaychecks);
