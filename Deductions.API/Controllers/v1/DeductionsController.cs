@@ -60,7 +60,8 @@ namespace Deductions.API.Controllers.v1
                 Name = employeeEntity.Name,
                 TotalDeductionAmount = $"{totalDeductionAmount:C}",
                 TotalAmountOfDiscount = $"{employeeTotalDiscountAmount:C}",
-                NumberOfDependents = employeeEntity.Dependents?.Any() == true ? employeeEntity.Dependents.Count : 0
+                NumberOfDependents = employeeEntity.Dependents?.Any() == true ? employeeEntity.Dependents.Count : 0,
+                PaycheckAmount = $"{Constants.MaximumDeductionAmount - totalDeductionAmount:C}"
             });
         }
     }

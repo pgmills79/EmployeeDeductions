@@ -15,5 +15,8 @@ namespace Deductions.Domain.Models
         
         [JsonPropertyName("Number of Dependents")]
         public int NumberOfDependents { get; set; }
+        
+        [JsonPropertyName("Net Paycheck Amount")]
+        public string PaycheckAmount { get; set; }
     }
 }
