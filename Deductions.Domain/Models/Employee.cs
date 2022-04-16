@@ -4,7 +4,7 @@ namespace Deductions.Domain.Models
 {
     public interface IEmployee
     {
-        List<IPerson> Dependents { get; set; }
+       // List<IPerson> Dependents { get; set; }
     }
 
     public class Employee : IPerson, IEmployee
