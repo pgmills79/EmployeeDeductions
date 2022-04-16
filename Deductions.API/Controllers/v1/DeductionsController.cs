@@ -1,7 +1,6 @@
 ﻿using System.Net.Mime;
 using Deductions.Domain.Models;
 using Deductions.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -35,7 +34,7 @@ namespace Deductions.API.Controllers.v1
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public decimal GetEmployeePaycheckDeduction([FromBody] Employee employeeEntity)
+        public JsonResult GetEmployeePaycheckDeduction([FromBody] Employee employeeEntity)
         {
             
             //get employee deduction amount
@@ -45,11 +44,14 @@ namespace Deductions.API.Controllers.v1
             var dependentDeductionAmount =
                 _dependentService.GetDependentsPaycheckDeductionAmount(employeeEntity.Dependents);
 
-            var totalDeductionAmount = dependentDeductionAmount + employeeDeductionAmount;
-            
-            var result = _employeeService.GetEmployeeTotalCostPerPaycheck(employeeDeductionAmount, dependentDeductionAmount);
+            var totalDeductionAmount = _employeeService.GetEmployeeTotalCostPerPaycheck(employeeDeductionAmount, dependentDeductionAmount);
 
-            return 0.00m;
+            return new JsonResult(new DeductionResult
+            {
+                Name = employeeEntity.Name,
+                TotalDeductionAmount = totalDeductionAmount,
+                NumberOfDependents = employeeEntity.Dependents.Count
+            });
         }
     }
 }

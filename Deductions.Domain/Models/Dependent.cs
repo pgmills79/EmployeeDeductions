@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Deductions.Domain.Models
+﻿namespace Deductions.Domain.Models
 {
     public class Dependent : IPerson
     {

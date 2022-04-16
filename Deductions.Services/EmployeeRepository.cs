@@ -1,6 +1,5 @@
 ﻿using System;
 using Deductions.Domain;
-using Deductions.Domain.Models;
 
 namespace Deductions.Services
 {
@@ -55,9 +54,10 @@ namespace Deductions.Services
             var totalDeductionAmount = employeeDeductionAmount + dependentDeductionAmount;
             
             //if the amount is higher than the maximum cost for employee benefits, set it to the maximum amount
-            //if (totalDeductionAmount > _utilityService)
+            if (totalDeductionAmount > BaseRepository.MaximumDeductionAmount)
+                totalDeductionAmount = BaseRepository.MaximumDeductionAmount;
 
-            throw new NotImplementedException();
+            return totalDeductionAmount;
         }
 
         private static decimal GetEmployeeDeductionAmount()

@@ -5,6 +5,7 @@
         public const decimal DiscountPercent = 0.10m;
         public const char ApplyDiscountLetter = 'A';
         public const int NumberOfPaychecks = 26;
+        public const decimal MaximumDeductionAmount = 1500.00m;
     }
     
 }
