@@ -50,33 +50,7 @@ namespace Deductions.UnitTests
         }
 
         #region Dependent Calculations
-        
-        [Fact]
-        public void GetDependentDeductionAmount_Should_Return_Correct_Amount()
-        {
-            //arrange
-            var expectedResult = Convert.ToDecimal(DependentAnnualCost / NumberOfPaychecks).ToString("#.##");
-            
-            //action
-            var actualResult = _dependentRepository.GetDependentDeductionAmount();
 
-            //assert
-            Assert.True(expectedResult.Equals(actualResult.ToString("#.##")));
-        }
-        
-        [Fact]
-        public void GetDependentDiscountAmount_Should_Return_Correct_Amount()
-        {
-            //arrange
-            var expectedResult = Convert.ToDecimal( (DependentAnnualCost - BaseRepository.DiscountPercent * DependentAnnualCost) / BaseRepository.NumberOfPaychecks);
-            
-            //action
-            var actualResult = _dependentRepository.GetDependentDiscountAmount();
-
-            //assert
-            Assert.True(expectedResult.Equals(actualResult));
-        }
-        
         [Theory]
         [MemberData(nameof(TestGetDependentsTestData))]
         public void Get_Dependents_Paycheck_Deduction_Amount(List<Dependent> dependents, decimal expectedAmount)
@@ -84,7 +58,7 @@ namespace Deductions.UnitTests
             //arrange
 
             //action
-            var paycheckDeductionAmount = _dependentRepository.GetDependentsPaycheckDeductionAmount(dependents).ToString("#.##");
+            var paycheckDeductionAmount = _dependentRepository.GetDependentDeductionAmount(dependents).ToString("#.##");
 
             //assert
             Assert.True(paycheckDeductionAmount.Equals(expectedAmount.ToString("#.##")));
@@ -110,9 +84,9 @@ namespace Deductions.UnitTests
         
         #region Employee Calculations
         [Theory]
-        [InlineData("John Doe", 38.00)]
+        /*[InlineData("John Doe", 38.00)]
         [InlineData("Aaron Lewis", 34.62)]
-        [InlineData("  Aaron Lewis", 34.62)]
+        [InlineData("  Aaron Lewis", 34.62)]*/
         [InlineData("", 0.00)]
         public void Get_Employee_Deduction_Amount(string name, decimal expectedAmount)
         {
@@ -124,22 +98,7 @@ namespace Deductions.UnitTests
             //assert
             Assert.True(paycheckDeductionAmount.Equals(expectedAmount.ToString("#.##")));
         }
-        
-        [Fact]
-        public void GetEmployeeDiscountAmount_Should_Return_Correct_Amount()
-        {
-            //arrange
-            var expectedResult = Convert.ToDecimal((EmployeeAnnualCost - BaseRepository.DiscountPercent * EmployeeAnnualCost) /
-                                                   BaseRepository.NumberOfPaychecks).ToString("#.##");
-            
-            //action
-            var actualResult = _employeeRepository.GetEmployeeDiscountAmount();
 
-            //assert
-            Assert.True(expectedResult.Equals(actualResult.ToString("#.##")));
-        }
-
-       
 
         #endregion
 

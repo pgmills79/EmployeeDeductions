@@ -1,11 +1,22 @@
-﻿namespace Deductions.Services
+﻿using System;
+using Deductions.Domain;
+
+namespace Deductions.Services
 {
-    public static class BaseRepository
+    public abstract class BaseRepository
     {
-        public const decimal DiscountPercent = 0.10m;
-        public const char ApplyDiscountLetter = 'A';
-        public const int NumberOfPaychecks = 26;
-        public const decimal MaximumDeductionAmount = 1500.00m;
+
+        private readonly IUtility _utilityService;
+        protected BaseRepository(IUtility utilityService)
+        {
+            _utilityService = utilityService;
+        }
+        
+        protected decimal GetDeductionAmount(string name, decimal discountAmount, decimal regularDeduction)
+        {
+            if (string.IsNullOrEmpty(name)) return 0;
+            return _utilityService.DoesNameStartWithLetter(name, Constants.ApplyDiscountLetter) ? discountAmount : regularDeduction;
+        }
+        
     }
-    
 }

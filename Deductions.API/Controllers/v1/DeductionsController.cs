@@ -1,4 +1,6 @@
-﻿using System.Net.Mime;
+﻿using System.Linq;
+using System.Net.Mime;
+using Deductions.Domain;
 using Deductions.Domain.Models;
 using Deductions.Services;
 using Microsoft.AspNetCore.Http;
@@ -12,17 +14,16 @@ namespace Deductions.API.Controllers.v1
     [Route("api/v{version:apiVersion}/[controller]")]
     public class DeductionsController : ControllerBase
     {
-
-        private readonly ILogger<DeductionsController> _logger;
         private readonly IEmployeeRepository _employeeService;
         private readonly IDependentRepository _dependentService;
+        private readonly IUtility _utilityService;
 
 
-        public DeductionsController(ILogger<DeductionsController> logger, IEmployeeRepository employeeService, IDependentRepository dependentService)
+        public DeductionsController(IEmployeeRepository employeeService, IDependentRepository dependentService, IUtility utilityService)
         {
-            _logger = logger;
             _employeeService = employeeService;
             _dependentService = dependentService;
+            _utilityService = utilityService;
         }
 
         /// <summary>
@@ -36,21 +37,29 @@ namespace Deductions.API.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public JsonResult GetEmployeePaycheckDeduction([FromBody] Employee employeeEntity)
         {
-            
+
+            //Grab deduction information
             //get employee deduction amount
             var employeeDeductionAmount = _employeeService.GetEmployeeDeductionAmount(employeeEntity.Name);
-            
+
             //get dependents deduction amount
             var dependentDeductionAmount =
-                _dependentService.GetDependentsPaycheckDeductionAmount(employeeEntity.Dependents);
-
+                _dependentService.GetDependentDeductionAmount(employeeEntity.Dependents);
+            
             var totalDeductionAmount = _employeeService.GetEmployeeTotalCostPerPaycheck(employeeDeductionAmount, dependentDeductionAmount);
+            
+            //Grab discount information for information purposes
+            var employeeTotalDiscountAmount = 0.00m;
+            
+            employeeTotalDiscountAmount += _employeeService.GetEmployeeDiscountAmount();
+            employeeTotalDiscountAmount += _dependentService.GetTotalDependentDiscountAmount(employeeEntity.Dependents);
 
             return new JsonResult(new DeductionResult
             {
                 Name = employeeEntity.Name,
-                TotalDeductionAmount = totalDeductionAmount,
-                NumberOfDependents = employeeEntity.Dependents.Count
+                TotalDeductionAmount = $"{totalDeductionAmount:C}",
+                TotalAmountOfDiscount = $"{employeeTotalDiscountAmount:C}",
+                NumberOfDependents = employeeEntity.Dependents?.Any() == true ? employeeEntity.Dependents.Count : 0
             });
         }
     }

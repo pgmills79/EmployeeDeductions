@@ -11,42 +11,14 @@ namespace Deductions.Services
     }
     
     
-    public class EmployeeRepository : IEmployeeRepository
+    public class EmployeeRepository : BaseRepository, IEmployeeRepository
     {
-        private readonly IUtility _utilityService;
-        private const int EmployeeAnnualCost = 1000;
 
-        public EmployeeRepository(IUtility utilityService)
+        public EmployeeRepository(IUtility utilityService) : base(utilityService)
         {
-            _utilityService = utilityService;
         }
-
-        public decimal GetEmployeeDeductionAmount(string name)
-        {
-            var deductionAmount = 0.00m;
-
-            //if no employee name just return zero
-            if (string.IsNullOrEmpty(name)) return 0;
-
-            //add up the dependents amounts
-            if (_utilityService.DoesNameStartWithLetter(name, BaseRepository.ApplyDiscountLetter))
-            {
-                deductionAmount += GetEmployeeDiscountAmount();
-            }
-            else
-            {
-                deductionAmount += GetEmployeeDeductionAmount();
-            }
-
-            //does name get
-            return deductionAmount;
-        }
-
-        public decimal GetEmployeeDiscountAmount()
-        {
-            return Convert.ToDecimal((EmployeeAnnualCost - BaseRepository.DiscountPercent * EmployeeAnnualCost) /
-                                     BaseRepository.NumberOfPaychecks);
-        }
+        
+        public decimal GetEmployeeDeductionAmount(string name) => GetDeductionAmount(name, GetEmployeeDiscountAmount(), GetDeductionAmount());
 
         public decimal GetEmployeeTotalCostPerPaycheck(decimal employeeDeductionAmount, decimal dependentDeductionAmount)
         {
@@ -54,15 +26,23 @@ namespace Deductions.Services
             var totalDeductionAmount = employeeDeductionAmount + dependentDeductionAmount;
             
             //if the amount is higher than the maximum cost for employee benefits, set it to the maximum amount
-            if (totalDeductionAmount > BaseRepository.MaximumDeductionAmount)
-                totalDeductionAmount = BaseRepository.MaximumDeductionAmount;
+            if (totalDeductionAmount > Constants.MaximumDeductionAmount)
+                totalDeductionAmount = Constants.MaximumDeductionAmount;
 
             return totalDeductionAmount;
         }
-
-        private static decimal GetEmployeeDeductionAmount()
+        
+        public decimal GetEmployeeDiscountAmount()
         {
-            return Convert.ToDecimal(EmployeeAnnualCost / BaseRepository.NumberOfPaychecks);
+            return Convert.ToDecimal((Constants.EmployeeAnnualCost - Constants.DiscountPercent * Constants.EmployeeAnnualCost) /
+                                     Constants.NumberOfPaychecks);
         }
+        
+        private static decimal GetDeductionAmount()
+        {
+            return Convert.ToDecimal(Constants.EmployeeAnnualCost / Constants.NumberOfPaychecks);
+        }
+
+       
     }
 }

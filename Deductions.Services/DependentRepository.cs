@@ -8,53 +8,37 @@ namespace Deductions.Services
 {
     public interface IDependentRepository
     {
-        decimal GetDependentDeductionAmount();
-        decimal GetDependentDiscountAmount();
-        decimal GetDependentsPaycheckDeductionAmount(List<Dependent> dependents);
+        decimal GetTotalDependentDiscountAmount(List<Dependent> dependents);
+        decimal GetDependentDeductionAmount(List<Dependent> dependents);
     }
     
-    public class DependentRepository : IDependentRepository
+    public class DependentRepository : BaseRepository, IDependentRepository
     {
-        private const int DependentAnnualCost = 500;
-        private readonly IUtility _utilityService;
 
-        public DependentRepository(IUtility utilityService)
+        public DependentRepository(IUtility utilityService) : base(utilityService)
         {
-            _utilityService = utilityService;
         }
 
-        public decimal GetDependentsPaycheckDeductionAmount(List<Dependent> dependents)
+        public decimal GetDependentDeductionAmount(List<Dependent> dependents)
         {
-            var deductionAmount = 0.00m;
+            return dependents?.Any() != true ? 0 : 
+                dependents.Sum(dependent => GetDeductionAmount(dependent.Name, GetDependentDiscountAmount(), GetDeductionAmount()));
+        }
 
-            //if no dependents found just return zero
-            if (dependents?.Any() != true) return 0;
-
-            //add up the dependents amounts
-            foreach (var dependent in dependents)
-            {
-                if (_utilityService.DoesNameStartWithLetter(dependent.Name, BaseRepository.ApplyDiscountLetter))
-                {
-                    deductionAmount += GetDependentDiscountAmount();
-                }
-                else
-                {
-                    deductionAmount += GetDependentDeductionAmount();
-                }
-            }
-            
-            //does name get
-            return deductionAmount;
+        public decimal GetTotalDependentDiscountAmount(List<Dependent> dependents)
+        {
+            return dependents?.Any() != true ? 0 
+                : dependents.Sum(dependent => GetDeductionAmount(dependent.Name, GetDependentDiscountAmount(), GetDeductionAmount()));
         }
         
-        public decimal GetDependentDeductionAmount()
+        private static decimal GetDeductionAmount()
         {
-            return Convert.ToDecimal(DependentAnnualCost / BaseRepository.NumberOfPaychecks);
+            return Convert.ToDecimal(Constants.DependentAnnualCost / Constants.NumberOfPaychecks);
         }
 
-        public decimal GetDependentDiscountAmount()
+        private static decimal GetDependentDiscountAmount()
         {
-            return Convert.ToDecimal( (DependentAnnualCost - BaseRepository.DiscountPercent * DependentAnnualCost) / BaseRepository.NumberOfPaychecks);
+            return Convert.ToDecimal( (Constants.DependentAnnualCost - Constants.DiscountPercent * Constants.DependentAnnualCost) / Constants.NumberOfPaychecks);
         }
         
     }
