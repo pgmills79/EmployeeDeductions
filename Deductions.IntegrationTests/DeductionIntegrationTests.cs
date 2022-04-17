@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -18,12 +20,14 @@ namespace Deductions.IntegrationTests
         private readonly HttpClient _client;
         private readonly IEmployeeRepository _employeeService;
         private readonly ISpouseRepository _spouseService;
+        private readonly IDependentRepository _dependentService;
 
         public DeductionIntegrationTests(ApiWebApplicationFactory fixture)
         {
             _client = fixture.CreateClient();
             _employeeService = fixture.Services.GetService<IEmployeeRepository>();
             _spouseService = fixture.Services.GetService<ISpouseRepository>();
+            _dependentService = fixture.Services.GetService<IDependentRepository>();
         }
         
         [Fact]
@@ -119,6 +123,34 @@ namespace Deductions.IntegrationTests
             result.TotalDeductionAmount.Should().Be($"{totalDeductionAmount:C}");
             result.TotalAmountOfDiscount.Should().Be($"{spouseDiscountAmount:C}");
             result.NumberOfDependents.Should().Be(0);
+            result.PaycheckAmount.Should().Be($"{paycheckAmount:C}");
+        }
+        
+        [Fact]
+        public async void GetEmployeeTotalCostPerPaycheck_NoSpouse_One_Dependent_NoDiscount_Should_Return_Correct_Amounts()
+        {
+            // Arrange
+            const string employeeName = "9aron Kelly";
+            var dependentName = "8 Kelly";
+            var payload = $@"{{""Employee"":""{employeeName}"",""Dependents"": [{{""Dependent"": ""{dependentName}""}}]}}";
+            HttpContent c = new StringContent(payload, Encoding.UTF8, MediaType);
+            var dependentDeductionAmount =
+                Convert.ToDecimal(Constants.DependentAnnualCost / Constants.NumberOfPaychecks);
+            var totalDeductionAmount = _employeeService.GetEmployeeDeductionAmount(employeeName) + dependentDeductionAmount;
+            var paycheckAmount = Constants.MaximumDeductionAmount - totalDeductionAmount;
+
+            //Act
+            var response = await _client.PostAsync(Endpoint, c);
+            
+            //Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var result = JsonConvert.DeserializeObject<DeductionResult>(await response.Content.ReadAsStringAsync());
+
+            result.Name.Should().Be(employeeName);
+            result.Spouse.Should().BeNullOrEmpty();
+            result.TotalDeductionAmount.Should().Be($"{totalDeductionAmount:C}");
+            result.TotalAmountOfDiscount.Should().Be("$0.00");
+            result.NumberOfDependents.Should().Be(1);
             result.PaycheckAmount.Should().Be($"{paycheckAmount:C}");
         }
     }
