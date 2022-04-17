@@ -35,8 +35,8 @@ namespace Deductions.API
             });
             
             //DI service hookup
-            services.AddScoped<IUtility, Utility>();
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<ISpouseRepository, SpouseRepository>();
             services.AddScoped<IDependentRepository, DependentRepository>();
             
             services.AddMvcCore().SetCompatibilityVersion(CompatibilityVersion.Latest);

@@ -2,13 +2,13 @@
 
 namespace Deductions.Domain.Models
 {
-    public class Dependent : IPerson
+    public class Spouse : IPerson
     {
         
-        [JsonPropertyName("Dependent")]
+        [JsonPropertyName("Spouse")]
         public string Name { get; set; }
 
-        public Dependent(string name)
+        public Spouse(string name)
         {
             Name = name;
         }

@@ -14,15 +14,15 @@ namespace Deductions.API.Controllers.v1
     public class DeductionsController : ControllerBase
     {
         private readonly IEmployeeRepository _employeeService;
+        private readonly ISpouseRepository _spouseService;
         private readonly IDependentRepository _dependentService;
-        private readonly IUtility _utilityService;
 
 
-        public DeductionsController(IEmployeeRepository employeeService, IDependentRepository dependentService, IUtility utilityService)
+        public DeductionsController(IEmployeeRepository employeeService, IDependentRepository dependentService, ISpouseRepository spouseService)
         {
             _employeeService = employeeService;
             _dependentService = dependentService;
-            _utilityService = utilityService;
+            _spouseService = spouseService;
         }
 
         /// <summary>
@@ -40,24 +40,36 @@ namespace Deductions.API.Controllers.v1
             //Grab deduction information
             //get employee deduction amount
             var employeeDeductionAmount = _employeeService.GetEmployeeDeductionAmount(employeeEntity.Name);
+            
+            //get employee deduction amount
+            var spouseDeductionAmount = !string.IsNullOrEmpty(employeeEntity.Spouse)
+                ? _spouseService.GetSpouseDeductionAmount(employeeEntity.Spouse)
+                : 0;
 
             //get dependents deduction amount
             var dependentDeductionAmount =
                 _dependentService.GetDependentDeductionAmount(employeeEntity.Dependents);
             
-            var totalDeductionAmount = _employeeService.GetEmployeeTotalCostPerPaycheck(employeeDeductionAmount, dependentDeductionAmount);
-            
+            var totalDeductionAmount = _employeeService.GetEmployeeTotalCostPerPaycheck(employeeDeductionAmount, spouseDeductionAmount,
+                dependentDeductionAmount);
+
             //Grab discount information for information purposes
             var employeeTotalDiscountAmount = 0.00m;
             
-            employeeTotalDiscountAmount += _utilityService.DoesNameStartWithLetter(employeeEntity.Name, Constants.ApplyDiscountLetter) 
+            //Employee discount amount
+            employeeTotalDiscountAmount += _employeeService.DoesEmployeeGetDiscount(employeeEntity.Name) 
                 ? _employeeService.GetEmployeeDiscountAmount() : 0;
+            
+            //Spouse discount amount
+            employeeTotalDiscountAmount += _spouseService.DoesSpouseGetDiscount(employeeEntity.Spouse) 
+                ? _spouseService.GetSpouseDiscountAmount() : 0;
             
             employeeTotalDiscountAmount += _dependentService.GetTotalDependentDiscountAmount(employeeEntity.Dependents);
 
             return new JsonResult(new DeductionResult
             {
                 Name = employeeEntity.Name,
+                Spouse = employeeEntity.Spouse,
                 TotalDeductionAmount = $"{totalDeductionAmount:C}",
                 TotalAmountOfDiscount = $"{employeeTotalDiscountAmount:C}",
                 NumberOfDependents = employeeEntity.Dependents?.Any() == true ? employeeEntity.Dependents.Count : 0,

@@ -7,23 +7,20 @@ namespace Deductions.Services
     {
         decimal GetEmployeeDeductionAmount(string name);
         decimal GetEmployeeDiscountAmount();
-        decimal GetEmployeeTotalCostPerPaycheck(decimal employeeDeductionAmount, decimal dependentDeductionAmount);
+        decimal GetEmployeeTotalCostPerPaycheck(decimal employeeDeductionAmount, decimal spouseDeductionAmount, decimal dependentDeductionAmount);
+        bool DoesEmployeeGetDiscount(string inputName);
     }
     
     
     public class EmployeeRepository : BaseRepository, IEmployeeRepository
     {
 
-        public EmployeeRepository(IUtility utilityService) : base(utilityService)
-        {
-        }
-        
-        public decimal GetEmployeeDeductionAmount(string name) => GetDeductionAmount(name, GetEmployeeDiscountAmount(), GetDeductionAmount());
+        public decimal GetEmployeeDeductionAmount(string name) => GetDeductionAmount(name, GetEmployeeDiscountAmount(), GetEmployeeRegularAmount());
 
-        public decimal GetEmployeeTotalCostPerPaycheck(decimal employeeDeductionAmount, decimal dependentDeductionAmount)
+        public decimal GetEmployeeTotalCostPerPaycheck(decimal employeeDeductionAmount, decimal spouseDeductionAmount, decimal dependentDeductionAmount)
         {
 
-            var totalDeductionAmount = employeeDeductionAmount + dependentDeductionAmount;
+            var totalDeductionAmount = employeeDeductionAmount + + spouseDeductionAmount + dependentDeductionAmount;
             
             //if the amount is higher than the maximum cost for employee benefits, set it to the maximum amount
             if (totalDeductionAmount > Constants.MaximumDeductionAmount)
@@ -38,11 +35,12 @@ namespace Deductions.Services
                                      Constants.NumberOfPaychecks);
         }
         
-        private static decimal GetDeductionAmount()
+        private static decimal GetEmployeeRegularAmount()
         {
             return Convert.ToDecimal(Constants.EmployeeAnnualCost / Constants.NumberOfPaychecks);
         }
 
-       
+        public bool DoesEmployeeGetDiscount(string inputName) => DoesPersonGetDiscount(inputName);
+
     }
 }

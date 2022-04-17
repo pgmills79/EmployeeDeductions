@@ -10,15 +10,11 @@ namespace Deductions.Services
     {
         decimal GetTotalDependentDiscountAmount(List<Dependent> dependents);
         decimal GetDependentDeductionAmount(List<Dependent> dependents);
+        bool DoesDependentGetDiscount(string inputName);
     }
     
     public class DependentRepository : BaseRepository, IDependentRepository
     {
-        private readonly IUtility _utilityService;
-        public DependentRepository(IUtility utilityService) : base(utilityService)
-        {
-            _utilityService = utilityService;
-        }
 
         public decimal GetDependentDeductionAmount(List<Dependent> dependents)
         {
@@ -29,7 +25,7 @@ namespace Deductions.Services
         public decimal GetTotalDependentDiscountAmount(List<Dependent> dependents)
         {
             if (dependents?.Any() != true) return 0;
-            return dependents.Sum(dependent => _utilityService.DoesNameStartWithLetter(dependent.Name, Constants.ApplyDiscountLetter) 
+            return dependents.Sum(dependent => DoesPersonGetDiscount(dependent.Name)
                 ? GetDependentDiscountAmount() : 0);
         }
         
@@ -42,6 +38,8 @@ namespace Deductions.Services
         {
             return Convert.ToDecimal( (Constants.DependentAnnualCost - Constants.DiscountPercent * Constants.DependentAnnualCost) / Constants.NumberOfPaychecks);
         }
+        
+        public bool DoesDependentGetDiscount(string inputName) => DoesPersonGetDiscount(inputName);
         
     }
 }

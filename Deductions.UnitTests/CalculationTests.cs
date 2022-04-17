@@ -12,44 +12,87 @@ namespace Deductions.UnitTests
         
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IDependentRepository _dependentRepository;
-        private readonly IUtility _utility;
+        private readonly ISpouseRepository _spouseRepository;
 
         public CalculationTests()
         {
+            
             //The 'DI" is not baked into XUnit and since this is not the integration test just newing these up
-            _utility = new Utility();
-            _dependentRepository = new DependentRepository(_utility);
-            _employeeRepository = new EmployeeRepository(_utility);
+            _employeeRepository = new EmployeeRepository();
+            _spouseRepository = new SpouseRepository();
+            _dependentRepository = new DependentRepository();
+            
         }
 
         private const int NumberOfPaychecks = 26;
         private const int DependentAnnualCost = 500;
-        private const int EmployeeAnnualCost = 1000;
         private const  decimal DiscountPercent = 0.10m;
 
 
         [Theory]
-        [InlineData("John Doe", 'A', false)]
-        [InlineData("Aaron Mills", 'A', true)]
-        [InlineData("Aaron Mills", 'B', false)]
-        [InlineData("Paul Mills", 'P', true)]
-        [InlineData("Paul Mills", 'p', true)]
-        [InlineData("john Doe", 'J', true)]
-        [InlineData(null, 'J', false)]
-        [InlineData("Paul Mills", ' ', false)]
-        [InlineData("  Paul Mills", 'P', true)]
-        public void Does_Name_Start_With_Specific_Letter(string nameInput, char letterToCheck, bool expectedResult)
+        [InlineData("John Doe")]
+        [InlineData("Aaron Mills")]
+        [InlineData("Paul Mills")]
+        [InlineData(" Paul Mills")]
+        [InlineData("john Doe")]
+        [InlineData(null)]
+        [InlineData("  Paul Mills")]
+        public void Does_Employee_GetDiscount_Should_Return_Correct_Result(string nameInput)
         {
             //arrange
+            var expectedResult = !string.IsNullOrEmpty(nameInput) && nameInput.TrimStart()
+                .StartsWith(Constants.ApplyDiscountLetter, StringComparison.InvariantCultureIgnoreCase);
 
             //action
-            var nameStartsWithInputLetter = _utility.DoesNameStartWithLetter(nameInput, letterToCheck);
+            var result = _employeeRepository.DoesEmployeeGetDiscount(nameInput);
 
             //assert
-           Assert.True(nameStartsWithInputLetter.Equals(expectedResult));
+           Assert.True(result.Equals(expectedResult));
         }
 
-        #region Dependent Calculations
+        #region Dependent/Spouse Tests
+        
+        [Theory]
+        [InlineData("John Doe")]
+        [InlineData("Aaron Mills")]
+        [InlineData("Paul Mills")]
+        [InlineData(" Paul Mills")]
+        [InlineData("john Doe")]
+        [InlineData(null)]
+        [InlineData("  Paul Mills")]
+        public void Does_Dependent_GetDiscount_Should_Return_Correct_Result(string nameInput)
+        {
+            //arrange
+            var expectedResult = !string.IsNullOrEmpty(nameInput) && nameInput.TrimStart()
+                .StartsWith(Constants.ApplyDiscountLetter, StringComparison.InvariantCultureIgnoreCase);
+
+            //action
+            var result = _dependentRepository.DoesDependentGetDiscount(nameInput);
+
+            //assert
+            Assert.True(result.Equals(expectedResult));
+        }
+        
+        [Theory]
+        [InlineData("John Doe")]
+        [InlineData("Aaron Mills")]
+        [InlineData("Paul Mills")]
+        [InlineData(" Paul Mills")]
+        [InlineData("john Doe")]
+        [InlineData(null)]
+        [InlineData("  Paul Mills")]
+        public void Does_Spouse_GetDiscount_Should_Return_Correct_Result(string nameInput)
+        {
+            //arrange
+            var expectedResult = !string.IsNullOrEmpty(nameInput) && nameInput.TrimStart()
+                .StartsWith(Constants.ApplyDiscountLetter, StringComparison.InvariantCultureIgnoreCase);
+
+            //action
+            var result = _spouseRepository.DoesSpouseGetDiscount(nameInput);
+
+            //assert
+            Assert.True(result.Equals(expectedResult));
+        }
 
         [Theory]
         [MemberData(nameof(TestGetDependentsTestData))]

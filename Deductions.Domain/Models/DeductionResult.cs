@@ -7,6 +7,10 @@ namespace Deductions.Domain.Models
         [JsonPropertyName("Employee Name")]
         public string Name { get; set; }
         
+        [JsonPropertyName("Spouse Name")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string Spouse { get; set; }
+        
         [JsonPropertyName("Deduction Amount")]
         public string TotalDeductionAmount { get; set; }
         
@@ -18,5 +22,7 @@ namespace Deductions.Domain.Models
         
         [JsonPropertyName("Net Paycheck Amount")]
         public string PaycheckAmount { get; set; }
+        
+       
     }
 }
