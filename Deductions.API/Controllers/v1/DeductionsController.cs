@@ -30,7 +30,7 @@ namespace Deductions.API.Controllers.v1
         /// </summary>
         /// <param name="employeeEntity"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
