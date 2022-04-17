@@ -18,8 +18,6 @@ namespace Deductions.IntegrationTests
         private readonly HttpClient _client;
         private readonly IEmployeeRepository _employeeService;
         private readonly ISpouseRepository _spouseService;
-        private const int EmployeeDeductionAmount = Constants.EmployeeAnnualCost / Constants.NumberOfPaychecks;
-        private const int SpouseDeductionAmount = Constants.SpouseAnnualCost / Constants.NumberOfPaychecks;
 
         public DeductionIntegrationTests(ApiWebApplicationFactory fixture)
         {
@@ -71,12 +69,15 @@ namespace Deductions.IntegrationTests
         }
         
         [Fact]
-        public async void GetEmployeeTotalCostPerPaycheck_Spouse_Only_No_Discounts_Should_Return_Correct_Amount()
+        public async void GetEmployeeTotalCostPerPaycheck_Spouse_Only_No_Discounts_Should_Return_Correct_Values()
         {
             // Arrange
-            const string payload = "{\"Employee\":\"Bob Jones\",\"Spouse\":\"Tom Kelly\"}";
+            const string employeeName = "8aron Kelly";
+            const string spouseName = "9aron Kelly";
+            var payload = $@"{{""Employee"":""{employeeName}"",""Spouse"": ""{spouseName}""}}";
             HttpContent c = new StringContent(payload, Encoding.UTF8, MediaType);
-            const decimal totalDeductionAmount = EmployeeDeductionAmount + SpouseDeductionAmount;
+            var totalDeductionAmount = _employeeService.GetEmployeeDeductionAmount(employeeName) + _spouseService.GetSpouseDeductionAmount(spouseName);
+            var paycheckAmount = Constants.MaximumDeductionAmount - totalDeductionAmount;
 
             //Act
             var response = await _client.PostAsync(Endpoint, c);
@@ -85,20 +86,26 @@ namespace Deductions.IntegrationTests
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             var result = JsonConvert.DeserializeObject<DeductionResult>(await response.Content.ReadAsStringAsync());
 
+            result.Name.Should().Be(employeeName);
+            result.Spouse.Should().Be(spouseName);
             result.TotalDeductionAmount.Should().Be($"{totalDeductionAmount:C}");
+            result.TotalAmountOfDiscount.Should().Be("$0.00");
+            result.NumberOfDependents.Should().Be(0);
+            result.PaycheckAmount.Should().Be($"{paycheckAmount:C}");
 
         }
         
         [Fact]
-        public async void GetEmployeeTotalCostPerPaycheck_Spouse_Only_With_One_Discount_Should_Return_Correct_Amount()
+        public async void GetEmployeeTotalCostPerPaycheck_Spouse_Only_With_One_Discount_Should_Return_Correct_Amounts()
         {
             // Arrange
-            var spouseName = "Tom Kelly";
-            const string payload = $"{"Employee":"Aaron Jones, "Spouse:"{spouseName}"}";
-            
+            const string employeeName = "9aron Kelly";
+            var spouseName = $"{Constants.ApplyDiscountLetter}aron Kelly";
+            var payload = $@"{{""Employee"":""{employeeName}"",""Spouse"": ""{spouseName}""}}";
             HttpContent c = new StringContent(payload, Encoding.UTF8, MediaType);
-            var totalDeductionAmount =
-                _employeeService.GetEmployeeDiscountAmount() + _spouseService.GetSpouseDeductionAmount("Tom Kelly");
+            var spouseDiscountAmount = _spouseService.GetSpouseDiscountAmount();
+            var totalDeductionAmount = _employeeService.GetEmployeeDeductionAmount(employeeName) + _spouseService.GetSpouseDiscountAmount();
+            var paycheckAmount = Constants.MaximumDeductionAmount - totalDeductionAmount;
 
             //Act
             var response = await _client.PostAsync(Endpoint, c);
@@ -107,8 +114,12 @@ namespace Deductions.IntegrationTests
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             var result = JsonConvert.DeserializeObject<DeductionResult>(await response.Content.ReadAsStringAsync());
 
+            result.Name.Should().Be(employeeName);
+            result.Spouse.Should().Be(spouseName);
             result.TotalDeductionAmount.Should().Be($"{totalDeductionAmount:C}");
-
+            result.TotalAmountOfDiscount.Should().Be($"{spouseDiscountAmount:C}");
+            result.NumberOfDependents.Should().Be(0);
+            result.PaycheckAmount.Should().Be($"{paycheckAmount:C}");
         }
     }
 }
