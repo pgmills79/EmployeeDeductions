@@ -7,14 +7,14 @@ using Xunit;
 
 namespace Deductions.UnitTests
 {
-    public class CalculationTests 
+    public class DeductionUnitTests 
     {
         
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IDependentRepository _dependentRepository;
         private readonly ISpouseRepository _spouseRepository;
 
-        public CalculationTests()
+        public DeductionUnitTests()
         {
             
             //The 'DI" is not baked into XUnit and since this is not the integration test just newing these up
@@ -127,9 +127,9 @@ namespace Deductions.UnitTests
         
         #region Employee Calculations
         [Theory]
-        /*[InlineData("John Doe", 38.00)]
+        [InlineData("John Doe", 38.00)]
         [InlineData("Aaron Lewis", 34.62)]
-        [InlineData("  Aaron Lewis", 34.62)]*/
+        [InlineData("  Aaron Lewis", 34.62)]
         [InlineData("", 0.00)]
         public void Get_Employee_Deduction_Amount(string name, decimal expectedAmount)
         {

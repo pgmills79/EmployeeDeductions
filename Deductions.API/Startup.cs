@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Deductions.Domain;
 using Deductions.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

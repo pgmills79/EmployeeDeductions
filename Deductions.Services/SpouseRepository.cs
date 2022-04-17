@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Deductions.Domain;
-using Deductions.Domain.Models;
 
 namespace Deductions.Services
 {

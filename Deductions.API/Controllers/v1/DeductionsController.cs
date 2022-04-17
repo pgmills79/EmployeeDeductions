@@ -17,7 +17,6 @@ namespace Deductions.API.Controllers.v1
         private readonly ISpouseRepository _spouseService;
         private readonly IDependentRepository _dependentService;
 
-
         public DeductionsController(IEmployeeRepository employeeService, IDependentRepository dependentService, ISpouseRepository spouseService)
         {
             _employeeService = employeeService;
@@ -38,33 +37,10 @@ namespace Deductions.API.Controllers.v1
         {
 
             //Grab deduction information
-            //get employee deduction amount
-            var employeeDeductionAmount = _employeeService.GetEmployeeDeductionAmount(employeeEntity.Name);
-            
-            //get employee deduction amount
-            var spouseDeductionAmount = !string.IsNullOrEmpty(employeeEntity.Spouse)
-                ? _spouseService.GetSpouseDeductionAmount(employeeEntity.Spouse)
-                : 0;
-
-            //get dependents deduction amount
-            var dependentDeductionAmount =
-                _dependentService.GetDependentDeductionAmount(employeeEntity.Dependents);
-            
-            var totalDeductionAmount = _employeeService.GetEmployeeTotalCostPerPaycheck(employeeDeductionAmount, spouseDeductionAmount,
-                dependentDeductionAmount);
+            var totalDeductionAmount = GrabTotalDeductionAmount(employeeEntity);
 
             //Grab discount information for information purposes
-            var employeeTotalDiscountAmount = 0.00m;
-            
-            //Employee discount amount
-            employeeTotalDiscountAmount += _employeeService.DoesEmployeeGetDiscount(employeeEntity.Name) 
-                ? _employeeService.GetEmployeeDiscountAmount() : 0;
-            
-            //Spouse discount amount
-            employeeTotalDiscountAmount += _spouseService.DoesSpouseGetDiscount(employeeEntity.Spouse) 
-                ? _spouseService.GetSpouseDiscountAmount() : 0;
-            
-            employeeTotalDiscountAmount += _dependentService.GetTotalDependentDiscountAmount(employeeEntity.Dependents);
+            var employeeTotalDiscountAmount = GrabTotalDiscountAmount(employeeEntity);
 
             return new JsonResult(new DeductionResult
             {
@@ -75,6 +51,45 @@ namespace Deductions.API.Controllers.v1
                 NumberOfDependents = employeeEntity.Dependents?.Any() == true ? employeeEntity.Dependents.Count : 0,
                 PaycheckAmount = $"{Constants.MaximumDeductionAmount - totalDeductionAmount:C}"
             });
+        }
+
+        private decimal GrabTotalDiscountAmount(Employee employeeEntity)
+        {
+            var employeeTotalDiscountAmount = 0.00m;
+
+            //Employee discount amount
+            employeeTotalDiscountAmount += _employeeService.DoesEmployeeGetDiscount(employeeEntity.Name)
+                ? _employeeService.GetEmployeeDiscountAmount()
+                : 0;
+
+            //Spouse discount amount
+            employeeTotalDiscountAmount += _spouseService.DoesSpouseGetDiscount(employeeEntity.Spouse)
+                ? _spouseService.GetSpouseDiscountAmount()
+                : 0;
+
+            employeeTotalDiscountAmount += _dependentService.GetTotalDependentDiscountAmount(employeeEntity.Dependents);
+            
+            return employeeTotalDiscountAmount;
+        }
+
+        private decimal GrabTotalDeductionAmount(Employee employeeEntity)
+        {
+            var employeeDeductionAmount = _employeeService.GetEmployeeDeductionAmount(employeeEntity.Name);
+
+            //get employee deduction amount
+            var spouseDeductionAmount = !string.IsNullOrEmpty(employeeEntity.Spouse)
+                ? _spouseService.GetSpouseDeductionAmount(employeeEntity.Spouse)
+                : 0;
+
+            //get dependents deduction amount
+            var dependentDeductionAmount =
+                _dependentService.GetDependentDeductionAmount(employeeEntity.Dependents);
+
+            var totalDeductionAmount = _employeeService.GetEmployeeTotalCostPerPaycheck(employeeDeductionAmount,
+                spouseDeductionAmount,
+                dependentDeductionAmount);
+            
+            return totalDeductionAmount;
         }
     }
 }

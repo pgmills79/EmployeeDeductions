@@ -29,7 +29,7 @@ namespace Deductions.Services
                 ? GetDependentDiscountAmount() : 0);
         }
         
-        private static decimal GetDeductionAmount()
+        private static decimal GetDeductionAmount() 
         {
             return Convert.ToDecimal(Constants.DependentAnnualCost / Constants.NumberOfPaychecks);
         }
