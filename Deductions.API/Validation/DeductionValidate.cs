@@ -21,8 +21,7 @@ namespace Deductions.API.Validation
 
             RuleFor(p => p.Name)
                 .NotEmpty().WithMessage(EmptyEmployeeName);
-            //.MaximumLength(StringFieldMaximumLength).WithMessage(FullNameTooLong);
-            
+
             RuleFor(p => p.Dependents)
                 .Must(dependents => dependents == null || dependents.All(x => !string.IsNullOrEmpty(x.Name)))
                 .WithMessage(EmptyDependentName);
