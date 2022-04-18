@@ -1,10 +1,7 @@
-import * as root from "react-dom";
 import {Component} from "react";
-import './AddDependent.css';
-import logo from "./logo.svg";
+import './Deductions.css';
 
-// eslint-disable-next-line no-undef
-class AddDependent extends Component {
+class Deductions extends Component {
     constructor(props) {
         super(props);
         this.state = { items: [], text: '' };
@@ -65,6 +62,7 @@ class AddDependent extends Component {
 
         const jsonData = {
             "EmployeeName": "John Doe",
+            "Spouse" : "Sally Joe",
             "Dependents": [
                 {
                     "name": "Tom Willis"
@@ -99,4 +97,4 @@ class DependentList extends Component {
     }
 }
 
-export default AddDependent;
+export default Deductions;
