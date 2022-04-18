@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Deductions.Domain.Models;
 using FluentValidation;
 
 namespace Deductions.API.Validation
 {
-
 
     /// <summary>
     /// The validation class for deductions API
