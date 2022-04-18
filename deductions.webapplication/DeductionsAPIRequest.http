@@ -1,0 +1,13 @@
+POST https://localhost:5001/api/v1/deductions
+Content-Type: application/json
+
+{
+    "Employee": "John Doe",
+    "Dependents" :
+    [
+        {"Dependent" : "Aaron Thomas"},
+        {"Dependent" : "Tom Jones"}
+    ]
+}
+
+###
