@@ -129,7 +129,7 @@ namespace Deductions.IntegrationTests
         {
             // Arrange
             const string employeeName = "9aron Kelly";
-            var dependentName = "8 Kelly";
+            const string dependentName = "8 Kelly";
             var payload = $@"{{""Employee"":""{employeeName}"",""Dependents"": [{{""Dependent"": ""{dependentName}""}}]}}";
             HttpContent c = new StringContent(payload, Encoding.UTF8, MediaType);
             var dependentDeductionAmount =
