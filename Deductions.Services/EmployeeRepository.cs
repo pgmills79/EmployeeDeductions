@@ -20,7 +20,7 @@ namespace Deductions.Services
         public decimal GetEmployeeTotalCostPerPaycheck(decimal employeeDeductionAmount, decimal spouseDeductionAmount, decimal dependentDeductionAmount)
         {
 
-            var totalDeductionAmount = employeeDeductionAmount + + spouseDeductionAmount + dependentDeductionAmount;
+            var totalDeductionAmount = employeeDeductionAmount + spouseDeductionAmount + dependentDeductionAmount;
             
             //if the amount is higher than the maximum cost for employee benefits, set it to the maximum amount
             if (totalDeductionAmount > Constants.MaximumDeductionAmount)
