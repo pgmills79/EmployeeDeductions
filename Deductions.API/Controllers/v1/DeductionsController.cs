@@ -69,7 +69,7 @@ namespace Deductions.API.Controllers.v1
 
             employeeTotalDiscountAmount += _dependentService.GetTotalDependentDiscountAmount(employeeEntity.Dependents);
             
-            return employeeTotalDiscountAmount;
+            return  employeeTotalDiscountAmount <= Constants.MaximumDeductionAmount ? employeeTotalDiscountAmount : Constants.MaximumDeductionAmount;
         }
 
         private decimal GrabTotalDeductionAmount(Employee employeeEntity)
