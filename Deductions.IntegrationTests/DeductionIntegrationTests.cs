@@ -20,14 +20,12 @@ namespace Deductions.IntegrationTests
         private readonly HttpClient _client;
         private readonly IEmployeeRepository _employeeService;
         private readonly ISpouseRepository _spouseService;
-        private readonly IDependentRepository _dependentService;
 
         public DeductionIntegrationTests(ApiWebApplicationFactory fixture)
         {
             _client = fixture.CreateClient();
             _employeeService = fixture.Services.GetService<IEmployeeRepository>();
             _spouseService = fixture.Services.GetService<ISpouseRepository>();
-            _dependentService = fixture.Services.GetService<IDependentRepository>();
         }
         
         [Fact]
