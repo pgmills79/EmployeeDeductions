@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using Deductions.API.Validation;
 using Deductions.Domain;
 using Deductions.Domain.Models;
 using Deductions.Services;
@@ -151,6 +152,59 @@ namespace Deductions.IntegrationTests
             result.TotalAmountOfDiscount.Should().Be("$0.00");
             result.NumberOfDependents.Should().Be(1);
             result.PaycheckAmount.Should().Be($"{paycheckAmount:C}");
+        }
+        
+        [Fact]
+        public async void Empty_Employee_Name_Should_Return_Validation_Error()
+        {
+            // Arrange
+            const string payload = @"{""Employee"":""""}";
+            HttpContent c = new StringContent(payload, Encoding.UTF8, MediaType);
+
+            //Act
+            var response = await _client.PostAsync(Endpoint, c);
+            
+            //Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            var validationResult =await response.Content.ReadAsStringAsync();
+            validationResult.Should().Contain(DeductionValidate.EmptyEmployeeName);
+
+        }
+        
+        [Fact]
+        public async void Empty_Provided_Spouse_Name_Should_Return_Validation_Error()
+        {
+            // Arrange
+            const string payload = @"{""Employee"":""Bob Jones"", ""Spouse"":""""}";
+            HttpContent c = new StringContent(payload, Encoding.UTF8, MediaType);
+
+            //Act
+            var response = await _client.PostAsync(Endpoint, c);
+            
+            //Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            var validationResult =await response.Content.ReadAsStringAsync();
+            validationResult.Should().Contain(DeductionValidate.EmptySpouseName);
+
+        }
+        
+        [Fact]
+        public async void Empty_Provided_Dependent_Name_Should_Return_Validation_Error()
+        {
+            // Arrange
+            const string employeeName = "Baron Kelly";
+            var dependentName = string.Empty;
+            var payload = $@"{{""Employee"":""{employeeName}"",""Dependents"": [{{""Dependent"": ""{dependentName}""}}]}}";
+            HttpContent c = new StringContent(payload, Encoding.UTF8, MediaType);
+
+            //Act
+            var response = await _client.PostAsync(Endpoint, c);
+            
+            //Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            var validationResult = await response.Content.ReadAsStringAsync();
+            validationResult.Should().Contain(DeductionValidate.EmptyDependentName);
+
         }
     }
 }

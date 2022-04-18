@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Deductions.Services;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +38,13 @@ namespace Deductions.API
             services.AddTransient<IEmployeeRepository, EmployeeRepository>();
             services.AddTransient<ISpouseRepository, SpouseRepository>();
             services.AddTransient<IDependentRepository, DependentRepository>();
+            
+            //add fluent validation on all models
+            services.AddFluentValidation(s => 
+            { 
+                s.RegisterValidatorsFromAssemblyContaining<Startup>();
+                s.AutomaticValidationEnabled = true;
+            });
             
             services.AddMvcCore().SetCompatibilityVersion(CompatibilityVersion.Latest);
             
