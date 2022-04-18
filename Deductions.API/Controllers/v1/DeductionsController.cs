@@ -27,7 +27,7 @@ namespace Deductions.API.Controllers.v1
         /// <summary>
         /// Get the employee's total paycheck deduction amount with dependents
         /// </summary>
-        /// <param name="employeeEntity"></param>
+        /// <param name="employeeEntity">The employee information payload</param>
         /// <returns></returns>
         [HttpPost]
         [Consumes(MediaTypeNames.Application.Json)]
